@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>798</width>
     <height>600</height>
    </rect>
   </property>
@@ -456,7 +456,7 @@
         <enum>Qt::Vertical</enum>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="toggleElectrodes">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -486,7 +486,7 @@
         <rect>
          <x>140</x>
          <y>50</y>
-         <width>111</width>
+         <width>121</width>
          <height>25</height>
         </rect>
        </property>
@@ -506,7 +506,7 @@
         </property>
        </item>
       </widget>
-      <widget class="QLabel" name="timSelectionLabel">
+      <widget class="QLabel" name="timeSelectionLabel">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -530,7 +530,166 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <zorder>pushButton</zorder>
+      <widget class="QLabel" name="SessionSelectionLabel">
+       <property name="geometry">
+        <rect>
+         <x>270</x>
+         <y>20</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(238, 238, 236);</string>
+       </property>
+       <property name="text">
+        <string>Session Selection</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBox_2">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>50</y>
+         <width>111</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <item>
+        <property name="text">
+         <string>Delta</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Theta</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Alpha</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Beta 1</string>
+        </property>
+       </item>
+      </widget>
+      <widget class="QLabel" name="connectElectrodeLabel">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>270</y>
+         <width>191</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(238, 238, 236);</string>
+       </property>
+       <property name="text">
+        <string>Connect Electrodes</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="downIntButton_2">
+       <property name="geometry">
+        <rect>
+         <x>270</x>
+         <y>300</y>
+         <width>171</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="shortPulseButtonLight">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>490</x>
+         <y>10</y>
+         <width>71</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="text">
+        <string>Short Pulse</string>
+       </property>
+       <property name="checkable">
+        <bool>false</bool>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="userDesignatedspinBox">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>90</y>
+         <width>45</width>
+         <height>26</height>
+        </rect>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>60</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="timeSelectionLabel_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>80</y>
+         <width>201</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(238, 238, 236);</string>
+       </property>
+       <property name="text">
+        <string>User Designated Time</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <zorder>toggleElectrodes</zorder>
       <zorder>top2Graphs</zorder>
       <zorder>middle3Graphs</zorder>
       <zorder>powerButton</zorder>
@@ -553,7 +712,14 @@
       <zorder>graphLabel7</zorder>
       <zorder>graphLabel8</zorder>
       <zorder>comboBox</zorder>
-      <zorder>timSelectionLabel</zorder>
+      <zorder>timeSelectionLabel</zorder>
+      <zorder>SessionSelectionLabel</zorder>
+      <zorder>comboBox_2</zorder>
+      <zorder>connectElectrodeLabel</zorder>
+      <zorder>downIntButton_2</zorder>
+      <zorder>shortPulseButtonLight</zorder>
+      <zorder>userDesignatedspinBox</zorder>
+      <zorder>timeSelectionLabel_2</zorder>
      </widget>
     </item>
     <item>
