@@ -12,14 +12,18 @@ MainWindow::MainWindow(QWidget *parent)
     batteryLifeTimer = new QTimer();
 
     //create manager
-    sesnMngr = new sessionMngr();
+    mngr = new sessionMngr(this);
 
     //connect slots
     connect(ui->powerButton, SIGNAL(released()), this, SLOT (togglePwr()));
     connect(idleTimer, SIGNAL(timeout()),this,SLOT (idleTimerExpired()));
     connect(batteryLifeTimer, SIGNAL(timeout()),this,SLOT (batteryLifeTimerTick()));
+    connect(ui->adminConnectedComboBox, SIGNAL(currentIndexChanged(int)),this,SLOT (updateConnection()));
+    connect(ui->checkButton, SIGNAL(released()),this,SLOT (checkButtonPress()));
 
-    connect(ui->adminConnectedComboBox, SIGNAL(currentIndexChanged(int)),this,SLOT (on_adminConnectedComboBox_currentIndexChanged(int index)));
+    //connect siganls from sessionMngr to slots
+    connect(mngr,SIGNAL(sessionStart()),this,SLOT (displaySessionStart()));
+
     //init buttons / displays / battery
     isOn=false;
     batteryLife=100;
@@ -85,10 +89,27 @@ void MainWindow::batteryLifeTimerTick(){
 
 }
 
-void MainWindow::on_adminConnectedComboBox_currentIndexChanged(int index)
-{
-    if(index == 0)
-        sesnMngr->setConnected(true);
+void MainWindow::updateConnection(){
+    if(ui->adminConnectedComboBox->currentIndex() == 0)
+        mngr->setConnected(true);
     else
-        sesnMngr->setConnected(false);
+        mngr->setConnected(false);
+}
+
+
+void MainWindow::displaySessionStart(){
+    //the signal from session manager has informed the main window of session start, so update the members and stop the idleTimer
+    sessionInProgress=true;
+    idleTimer->stop();
+
+}
+
+void MainWindow::checkButtonPress(){
+    //TO DO: we need to actually adjust the values here to pass
+    int dur;
+    if (ui->comboBox->currentIndex()==0){
+        dur=20;
+    }
+    mngr->startSession(dur,ui->comboBox_2->currentIndex(),5);
+
 }
