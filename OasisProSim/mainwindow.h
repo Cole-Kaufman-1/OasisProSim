@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "QTimer"
+#include "QtGlobal"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,5 +19,23 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+    //member var
+    bool isOn;
+    int batteryLife;
+    bool sessionInProgress;
+
+    //members
+    QTimer* idleTimer;
+    QTimer* batteryLifeTimer;
+
+
+private slots:
+    void togglePwr(); //turns device on and off
+
+public slots:
+    void idleTimerExpired(); //shuts device off if no session is started for 2 minutes after power on
+    void batteryLifeTimerTick(); //gradually decreases the remaining battery life
+
 };
 #endif // MAINWINDOW_H
