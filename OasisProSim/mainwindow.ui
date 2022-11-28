@@ -779,7 +779,10 @@
            <item row="2" column="2">
             <widget class="QComboBox" name="adminConnectedComboBox">
              <property name="currentText">
-              <string>TRUE</string>
+              <string>FALSE</string>
+             </property>
+             <property name="currentIndex">
+              <number>1</number>
              </property>
              <item>
               <property name="text">

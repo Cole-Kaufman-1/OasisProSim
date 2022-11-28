@@ -15,8 +15,11 @@ public:
 private:
     bool connectionTest();
     bool connected;
-signals:
 
+public slots:
+
+signals:
+    void sessionStart();
 };
 
 #endif // SESSIONMNGR_H

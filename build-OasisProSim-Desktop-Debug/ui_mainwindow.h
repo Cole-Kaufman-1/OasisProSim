@@ -442,6 +442,7 @@ public:
         toggleElectrodes->setDefault(false);
         shortPulseButtonLight->setDefault(false);
         tabWidget->setCurrentIndex(0);
+        adminConnectedComboBox->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -490,7 +491,7 @@ public:
         adminConnectedComboBox->setItemText(0, QApplication::translate("MainWindow", "TRUE", nullptr));
         adminConnectedComboBox->setItemText(1, QApplication::translate("MainWindow", "FALSE", nullptr));
 
-        adminConnectedComboBox->setCurrentText(QApplication::translate("MainWindow", "TRUE", nullptr));
+        adminConnectedComboBox->setCurrentText(QApplication::translate("MainWindow", "FALSE", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(adminTab), QApplication::translate("MainWindow", "Admin", nullptr));
         exampleReplayLabel->setText(QApplication::translate("MainWindow", "1 - Session Type: Delta  Duration: 20 Minutes, Intensity: 8 (example while working)", nullptr));
         selectReplayButton->setText(QApplication::translate("MainWindow", "Select \n"
