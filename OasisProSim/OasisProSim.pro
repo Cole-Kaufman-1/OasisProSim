@@ -24,7 +24,6 @@ SOURCES += \
 HEADERS += \
     mainwindow.h \
     session.h \
-    sessionmanager.h \
     sessionmngr.h
 
 FORMS += \
