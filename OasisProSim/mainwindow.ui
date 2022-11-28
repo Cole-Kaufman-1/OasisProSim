@@ -481,7 +481,7 @@
         <bool>false</bool>
        </property>
       </widget>
-      <widget class="QComboBox" name="timeSelectvionComboBox">
+      <widget class="QComboBox" name="timeSelectionComboBox">
        <property name="geometry">
         <rect>
          <x>140</x>
@@ -711,7 +711,7 @@
       <zorder>graphLabel6</zorder>
       <zorder>graphLabel7</zorder>
       <zorder>graphLabel8</zorder>
-      <zorder>timeSelectvionComboBox</zorder>
+      <zorder>timeSelectionComboBox</zorder>
       <zorder>timeSelectionLabel</zorder>
       <zorder>SessionSelectionLabel</zorder>
       <zorder>sessionSelectionComboBox</zorder>

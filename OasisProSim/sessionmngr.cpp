@@ -27,7 +27,6 @@ bool sessionMngr::connectionTest(){
 
 void sessionMngr::setConnected(bool connection){
     connected = connection;
-    qInfo("electrodes are connected");
 }
 
 

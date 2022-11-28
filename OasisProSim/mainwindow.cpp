@@ -107,9 +107,9 @@ void MainWindow::displaySessionStart(){
 void MainWindow::checkButtonPress(){
     //TO DO: we need to actually adjust the values here to pass
     int dur;
-    if (ui->comboBox->currentIndex()==0){
+    if (ui->timeSelectionComboBox->currentIndex()==0){
         dur=20;
     }
-    mngr->startSession(dur,ui->comboBox_2->currentIndex(),5);
+    mngr->startSession(dur,ui->sessionSelectionComboBox->currentIndex(),5);
 
 }
