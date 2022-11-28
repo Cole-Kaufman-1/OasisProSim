@@ -11,10 +11,10 @@ class sessionMngr : public QObject
 public:
     explicit sessionMngr(QObject *parent = nullptr);
     void startSession(int type, int duration, int intensity);
-
+    void setConnected(bool connection);
 private:
     bool connectionTest();
-
+    bool connected;
 signals:
 
 };

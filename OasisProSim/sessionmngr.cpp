@@ -9,14 +9,21 @@ sessionMngr::sessionMngr(QObject *parent) : QObject(parent)
 void sessionMngr::startSession(int type, int duration, int intensity){
 
     if(connectionTest()){
-
+        qInfo("connection test worked");
     }
 
 }
 
 bool sessionMngr::connectionTest(){
-    return true;
     //need to expand on this later
 
-    //link up to the true or false attribute of the
+    if(this->connected){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+void sessionMngr::setConnected(bool connection){
+    connected = connection;
 }

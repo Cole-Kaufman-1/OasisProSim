@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include "QTimer"
 #include "QtGlobal"
-
+#include "sessionmngr.h"
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -26,6 +26,7 @@ private:
     bool sessionInProgress;
 
     //members
+    sessionMngr* sesnMngr;
     QTimer* idleTimer;
     QTimer* batteryLifeTimer;
 

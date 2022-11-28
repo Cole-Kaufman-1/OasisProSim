@@ -11,11 +11,15 @@ MainWindow::MainWindow(QWidget *parent)
     idleTimer = new QTimer();
     batteryLifeTimer = new QTimer();
 
+    //create manager
+    sesnMngr = new sessionMngr();
+
     //connect slots
     connect(ui->powerButton, SIGNAL(released()), this, SLOT (togglePwr()));
     connect(idleTimer, SIGNAL(timeout()),this,SLOT (idleTimerExpired()));
     connect(batteryLifeTimer, SIGNAL(timeout()),this,SLOT (batteryLifeTimerTick()));
 
+    connect(ui->adminConnectedComboBox, SIGNAL(currentIndexChanged(int)),this,SLOT (on_adminConnectedComboBox_currentIndexChanged(int index)));
     //init buttons / displays / battery
     isOn=false;
     batteryLife=100;
@@ -78,9 +82,13 @@ void MainWindow::batteryLifeTimerTick(){
         qInfo("Battery has died");
         togglePwr();
     }
+
 }
 
 void MainWindow::on_adminConnectedComboBox_currentIndexChanged(int index)
 {
-
+    if(index == 0)
+        sesnMngr->setConnected(true);
+    else
+        sesnMngr->setConnected(false);
 }
