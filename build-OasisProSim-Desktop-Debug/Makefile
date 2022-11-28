@@ -37,7 +37,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = OasisProSim1.0.0
-DISTDIR = /home/student/Desktop/OasisProSim/build-OasisProSim-Desktop-Debug/.tmp/OasisProSim1.0.0
+DISTDIR = /home/student/project/OasisProSim/build-OasisProSim-Desktop-Debug/.tmp/OasisProSim1.0.0
 LINK          = g++
 LFLAGS        = 
 LIBS          = $(SUBLIBS) /usr/lib/x86_64-linux-gnu/libQt5Widgets.so /usr/lib/x86_64-linux-gnu/libQt5Gui.so /usr/lib/x86_64-linux-gnu/libQt5Core.so /usr/lib/x86_64-linux-gnu/libGL.so -lpthread   
@@ -53,10 +53,16 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = ../OasisProSim/main.cpp \
-		../OasisProSim/mainwindow.cpp moc_mainwindow.cpp
+		../OasisProSim/mainwindow.cpp \
+		../OasisProSim/session.cpp \
+		../OasisProSim/sessionmngr.cpp moc_mainwindow.cpp \
+		moc_sessionmngr.cpp
 OBJECTS       = main.o \
 		mainwindow.o \
-		moc_mainwindow.o
+		session.o \
+		sessionmngr.o \
+		moc_mainwindow.o \
+		moc_sessionmngr.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -113,6 +119,7 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf \
+		../OasisProSim/.qmake.stash \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
@@ -132,8 +139,12 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
-		../OasisProSim/OasisProSim.pro ../OasisProSim/mainwindow.h ../OasisProSim/main.cpp \
-		../OasisProSim/mainwindow.cpp
+		../OasisProSim/OasisProSim.pro ../OasisProSim/mainwindow.h \
+		../OasisProSim/session.h \
+		../OasisProSim/sessionmngr.h ../OasisProSim/main.cpp \
+		../OasisProSim/mainwindow.cpp \
+		../OasisProSim/session.cpp \
+		../OasisProSim/sessionmngr.cpp
 QMAKE_TARGET  = OasisProSim
 DESTDIR       = 
 TARGET        = OasisProSim
@@ -201,6 +212,7 @@ Makefile: ../OasisProSim/OasisProSim.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/l
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
@@ -278,6 +290,7 @@ Makefile: ../OasisProSim/OasisProSim.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/l
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf:
+.qmake.stash:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf:
@@ -313,8 +326,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../OasisProSim/mainwindow.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../OasisProSim/main.cpp ../OasisProSim/mainwindow.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../OasisProSim/mainwindow.h ../OasisProSim/session.h ../OasisProSim/sessionmngr.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../OasisProSim/main.cpp ../OasisProSim/mainwindow.cpp ../OasisProSim/session.cpp ../OasisProSim/sessionmngr.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../OasisProSim/mainwindow.ui $(DISTDIR)/
 
 
@@ -347,13 +360,19 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -g -std=gnu++11 -Wall -W -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_mainwindow.cpp
+compiler_moc_header_make_all: moc_mainwindow.cpp moc_sessionmngr.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_mainwindow.cpp
+	-$(DEL_FILE) moc_mainwindow.cpp moc_sessionmngr.cpp
 moc_mainwindow.cpp: ../OasisProSim/mainwindow.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/student/Desktop/OasisProSim/build-OasisProSim-Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/student/Desktop/OasisProSim/OasisProSim -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../OasisProSim/mainwindow.h -o moc_mainwindow.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/student/project/OasisProSim/build-OasisProSim-Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/student/project/OasisProSim/OasisProSim -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../OasisProSim/mainwindow.h -o moc_mainwindow.cpp
+
+moc_sessionmngr.cpp: ../OasisProSim/sessionmngr.h \
+		../OasisProSim/session.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/student/project/OasisProSim/build-OasisProSim-Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/student/project/OasisProSim/OasisProSim -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../OasisProSim/sessionmngr.h -o moc_sessionmngr.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -383,8 +402,18 @@ mainwindow.o: ../OasisProSim/mainwindow.cpp ../OasisProSim/mainwindow.h \
 		ui_mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../OasisProSim/mainwindow.cpp
 
+session.o: ../OasisProSim/session.cpp ../OasisProSim/session.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o session.o ../OasisProSim/session.cpp
+
+sessionmngr.o: ../OasisProSim/sessionmngr.cpp ../OasisProSim/sessionmngr.h \
+		../OasisProSim/session.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o sessionmngr.o ../OasisProSim/sessionmngr.cpp
+
 moc_mainwindow.o: moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp
+
+moc_sessionmngr.o: moc_sessionmngr.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_sessionmngr.o moc_sessionmngr.cpp
 
 ####### Install
 

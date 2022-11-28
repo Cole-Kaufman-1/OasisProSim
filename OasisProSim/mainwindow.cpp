@@ -79,3 +79,8 @@ void MainWindow::batteryLifeTimerTick(){
         togglePwr();
     }
 }
+
+void MainWindow::on_adminConnectedComboBox_currentIndexChanged(int index)
+{
+
+}
