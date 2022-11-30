@@ -6,6 +6,7 @@
 #include <QString>
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
+#include <QList>
 
 class sessionMngr : public QObject
 {
@@ -16,15 +17,17 @@ public:
     void startSession(int type, int duration, int intensity);
     void setConnected(bool connection);
     bool addSessionRecord(const QString& user, const QString& sessionType, int duration, int intensityLevel);
-    bool deleteRecords();
+    bool addUserRecord(const QString &user);
 
+    bool deleteRecords();
+    void displayRecords();
 private:
     bool connectionTest();
     bool DBInit();
     bool connected;
     QSqlDatabase db;
     bool isValidRecord(const QString& user, const QString& sessionType, int duration, int intensityLevel);
-    bool addRecord(const QString& user, const QString& sessionType, int duration, int intensityLevel);
+
 
 
 

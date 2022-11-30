@@ -12,6 +12,10 @@ sessionMngr::sessionMngr(QObject *parent) : QObject(parent)
 
        if(!DBInit())
            throw "Error: Database has not been initialized";
+
+       //addSessionRecord("temp","temp",5,5);
+
+       displayRecords();
 }
 
 
@@ -26,21 +30,56 @@ bool sessionMngr::DBInit(){
 
 }
 
+void sessionMngr::displayRecords() {
+
+    QList<QString>* records = new QList<QString>;
+
+    QSqlQuery query;
+    query.exec("SELECT * FROM treatmentHistory");
+    while (query.next()) {
+        qInfo("%s",query.value(0).toString().toStdString());
+    }
+
+    QSqlQuery userQuery;
+
+    userQuery.exec("SELECT * FROM users");
+    while (query.next()) {
+        qInfo("%s",userQuery.value(0).toString());
+    }
+
+}
+
 
 bool sessionMngr::addSessionRecord(const QString &user, const QString &sessionType, int duration, int intensityLevel){
 
+    db.transaction();
+    QSqlQuery query;
+    query.prepare("INSERT INTO treatmentHistory (user, sessionType, duration, intensityLevel) VALUES (:user, :sessionType, :duration, :intensityLevel);");
 
+    QString u =  "bigdongshlong"; //TODO: change this later to be the user
+    QString m =  "massage";
+
+    query.bindValue(":user",u);
+    query.bindValue(":sessionType",m);
+    query.bindValue(":duration", 5);
+    query.bindValue(":intensityLevel", 10);
+    query.exec();
+
+    db.commit();
+
+}
+
+
+bool sessionMngr::addUserRecord(const QString &user){
 }
 
 
 bool sessionMngr::isValidRecord(const QString &user, const QString &sessionType, int duration, int intensityLevel){
 
+    //TODO: add verification for records
 
 }
 
-bool sessionMngr::addRecord(const QString &user, const QString &sessionType, int duration, int intensityLevel){
-
-}
 
 bool sessionMngr::deleteRecords(){
     QSqlQuery query;
