@@ -24,7 +24,7 @@ bool sessionMngr::DBInit(){
 
     db.transaction();
     QSqlQuery query;
-    query.exec("CREATE TABLE IF NOT EXISTS treatmentHistory (user TEXT NOT NULL UNIQUE PRIMARY KEY, sessionType TEXT NOT NULL, duration INTEGER NOT NULL, intensityLevel INTEGER NOT NULL);");
+    query.exec("CREATE TABLE IF NOT EXISTS treatmentHistory (user TEXT NOT NULL PRIMARY KEY, sessionType TEXT NOT NULL, duration INTEGER NOT NULL, intensityLevel INTEGER NOT NULL);");
     query.exec("CREATE TABLE IF NOT EXISTS users (name TEXT NOT NULL UNIQUE PRIMARY KEY, treatmentAmount INTEGER NOT NULL);");
     return db.commit();
 
@@ -55,22 +55,24 @@ bool sessionMngr::addSessionRecord(const QString &user, const QString &sessionTy
     db.transaction();
     QSqlQuery query;
     query.prepare("INSERT INTO treatmentHistory (user, sessionType, duration, intensityLevel) VALUES (:user, :sessionType, :duration, :intensityLevel);");
-
-    QString u =  "bigdongshlong"; //TODO: change this later to be the user
-    QString m =  "massage";
-
-    query.bindValue(":user",u);
-    query.bindValue(":sessionType",m);
-    query.bindValue(":duration", 5);
-    query.bindValue(":intensityLevel", 10);
+    query.bindValue(":user",user);
+    query.bindValue(":sessionType",sessionType);
+    query.bindValue(":duration", duration);
+    query.bindValue(":intensityLevel", intensityLevel);
     query.exec();
-
     db.commit();
 
 }
 
 
 bool sessionMngr::addUserRecord(const QString &user){
+    db.transaction();
+    QSqlQuery query;
+    query.prepare("INSERT INTO users (user, treatmentAmount) VALUES (:user, :treatmentAmount);");
+    query.bindValue(":user",user);
+    query.bindValue(":treatmentAmount",0);
+    query.exec();
+    db.commit();
 }
 
 
