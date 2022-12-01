@@ -16,8 +16,8 @@ public:
     explicit sessionMngr(QObject *parent = nullptr);
     void startSession(int type, int duration, int intensity);
     void setConnected(bool connection);
-    bool addSessionRecord(const QString& user, const QString& sessionType, int duration, int intensityLevel);
-    bool addUserRecord(const QString &user);
+    void addSessionRecord(const QString& user, const QString& sessionType, int duration, int intensityLevel);
+    void addUserRecord(const QString &user);
 
     bool deleteRecords();
     void displayRecords();
@@ -26,8 +26,10 @@ private:
     bool DBInit();
     bool connected;
     QSqlDatabase db;
+    bool runningSession;
     bool isValidRecord(const QString& user, const QString& sessionType, int duration, int intensityLevel);
-
+    QString sessionTypes[3] = { "Basic", "Middle", "Advanced" };
+    const QString tempUser = "tempUser"; //use this for testing purposes
 
 
 

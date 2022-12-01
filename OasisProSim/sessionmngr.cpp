@@ -2,8 +2,10 @@
 
 const QString sessionMngr::DATABASE_PATH = "/database/OasisPro.db";
 
+
 sessionMngr::sessionMngr(QObject *parent) : QObject(parent)
 {
+      runningSession = false;
       db = QSqlDatabase::addDatabase("QSQLITE");
       db.setDatabaseName("OasisPro.db");
 
@@ -12,12 +14,7 @@ sessionMngr::sessionMngr(QObject *parent) : QObject(parent)
 
        if(!DBInit())
            throw "Error: Database has not been initialized";
-
-       //addSessionRecord("temp","temp",5,5);
-
-       displayRecords();
 }
-
 
 //DB Initialization. Creates a couple of tables to utlise later. Specifically a table for treatment history and a table to track users
 bool sessionMngr::DBInit(){
@@ -30,6 +27,7 @@ bool sessionMngr::DBInit(){
 
 }
 
+//TODO: this function needs some updating - the display is not functioning as expected - we can see properly in terminal but not in output...
 void sessionMngr::displayRecords() {
 
     QList<QString>* records = new QList<QString>;
@@ -50,7 +48,7 @@ void sessionMngr::displayRecords() {
 }
 
 
-bool sessionMngr::addSessionRecord(const QString &user, const QString &sessionType, int duration, int intensityLevel){
+void sessionMngr::addSessionRecord(const QString &user, const QString &sessionType, int duration, int intensityLevel){
 
     db.transaction();
     QSqlQuery query;
@@ -64,8 +62,7 @@ bool sessionMngr::addSessionRecord(const QString &user, const QString &sessionTy
 
 }
 
-
-bool sessionMngr::addUserRecord(const QString &user){
+void sessionMngr::addUserRecord(const QString &user){
     db.transaction();
     QSqlQuery query;
     query.prepare("INSERT INTO users (user, treatmentAmount) VALUES (:user, :treatmentAmount);");
@@ -75,13 +72,12 @@ bool sessionMngr::addUserRecord(const QString &user){
     db.commit();
 }
 
-
 bool sessionMngr::isValidRecord(const QString &user, const QString &sessionType, int duration, int intensityLevel){
 
     //TODO: add verification for records
+    return false;
 
 }
-
 
 bool sessionMngr::deleteRecords(){
     QSqlQuery query;
@@ -93,12 +89,22 @@ bool sessionMngr::deleteRecords(){
 }
 
 
+//TODO: we are mapping the type here as an int over to an array of chars. This makes it easier to work with FOR NOW...doesn't require string to int conversion. Will need to change later
 void sessionMngr::startSession(int type, int duration, int intensity){
 
     if(connectionTest()){
         qInfo("connection test worked");
         emit sessionStart();
+
+
+        //creating session record at the start:
+        session *currSession = new session(type, duration,intensity);
+
+        //TODO: carry out session effect on UI
     }
+
+
+
 
 }
 

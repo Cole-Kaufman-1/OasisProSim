@@ -7,7 +7,6 @@ class session
 {
 public:
     session(int type, int duration, int intensity);
-    QString toString();
 
 private:
     int type;
