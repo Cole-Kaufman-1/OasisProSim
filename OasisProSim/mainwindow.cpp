@@ -20,6 +20,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(batteryLifeTimer, SIGNAL(timeout()),this,SLOT (batteryLifeTimerTick()));
     connect(ui->adminConnectedComboBox, SIGNAL(currentIndexChanged(int)),this,SLOT (updateConnection()));
     connect(ui->checkButton, SIGNAL(released()),this,SLOT (checkButtonPress()));
+    connect(ui->upIntButton, SIGNAL(released()),this,SLOT (changeInstensity()));
+    connect(ui->downIntButton, SIGNAL(released()),this,SLOT (changeInstensity()));
 
     //connect siganls from sessionMngr to slots
     connect(mngr,SIGNAL(sessionStart()),this,SLOT (displaySessionStart()));
@@ -112,4 +114,35 @@ void MainWindow::checkButtonPress(){
     }
     mngr->startSession(dur,ui->sessionSelectionComboBox->currentIndex(),5);
 
+}
+
+void MainWindow::changeInstensity(){
+    if (isOn==true){
+        if (sender()==ui->upIntButton){
+            if (currIntensity<8){
+                currIntensity++;
+            }
+        } else
+        if (sender()==ui->downIntButton){
+            if (currIntensity>0){
+                currIntensity--;
+            }
+        }
+        //now set the three graphs on the UI to match the intensity
+        //gonna be a lot of ifs
+        if (currIntensity<4){
+            ui->top2Graphs->setValue(0);
+            ui->middle3Graphs->setValue(0);
+            ui->bottom3Graphs->setValue(currIntensity);
+        } else
+        if (currIntensity<7){
+            ui->bottom3Graphs->setValue(3);
+            ui->middle3Graphs->setValue(currIntensity-3);
+            ui->top2Graphs->setValue(0);
+        } else {
+            ui->bottom3Graphs->setValue(3);
+            ui->middle3Graphs->setValue(3);
+            ui->top2Graphs->setValue(currIntensity-6);
+        }
+    }
 }

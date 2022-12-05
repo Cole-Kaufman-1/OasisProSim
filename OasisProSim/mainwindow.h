@@ -25,6 +25,7 @@ private:
     bool isOn;
     int batteryLife;
     bool sessionInProgress;
+    int currIntensity;
 
     //members
     sessionMngr* mngr;
@@ -41,6 +42,7 @@ public slots:
     void updateConnection();
     void displaySessionStart();
     void checkButtonPress();
+    void changeInstensity();
 
 
 };
