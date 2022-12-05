@@ -40,7 +40,7 @@ public slots:
     void idleTimerExpired(); //shuts device off if no session is started for 2 minutes after power on
     void batteryLifeTimerTick(); //gradually decreases the remaining battery life
     void updateConnection();
-    void displaySessionStart();
+    void onSessionStart();
     void checkButtonPress();
     void changeInstensity();
 

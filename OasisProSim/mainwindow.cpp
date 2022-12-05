@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->downIntButton, SIGNAL(released()),this,SLOT (changeInstensity()));
 
     //connect siganls from sessionMngr to slots
-    connect(mngr,SIGNAL(sessionStart()),this,SLOT (displaySessionStart()));
+    connect(mngr,SIGNAL(sessionStart()),this,SLOT (onSessionStart()));
 
     //init buttons / displays / battery
     isOn=false;
@@ -99,7 +99,7 @@ void MainWindow::updateConnection(){
 }
 
 
-void MainWindow::displaySessionStart(){
+void MainWindow::onSessionStart(){
     //the signal from session manager has informed the main window of session start, so update the members and stop the idleTimer
     sessionInProgress=true;
     idleTimer->stop();
