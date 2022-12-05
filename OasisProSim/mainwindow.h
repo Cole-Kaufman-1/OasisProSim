@@ -23,15 +23,13 @@ private:
 
     //member var
     bool isOn;
-    int batteryLife;
+    double batteryLife;
     bool sessionInProgress;
     int currIntensity;
 
     //members
     sessionMngr* mngr;
     QTimer* idleTimer;
-    QTimer* batteryLifeTimer;
-
 
 private slots:
     void togglePwr(); //turns device on and off

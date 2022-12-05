@@ -5,7 +5,9 @@ const QString sessionMngr::DATABASE_PATH = "/database/OasisPro.db";
 
 sessionMngr::sessionMngr(QObject *parent) : QObject(parent)
 {
+      batteryLifeTimer = new QTimer();
       runningSession = false;
+      sessionPaused = false;
       db = QSqlDatabase::addDatabase("QSQLITE");
       db.setDatabaseName("OasisPro.db");
 
@@ -90,22 +92,33 @@ bool sessionMngr::deleteRecords(){
 
 
 //TODO: we are mapping the type here as an int over to an array of chars. This makes it easier to work with FOR NOW...doesn't require string to int conversion. Will need to change later
+//TODO: add duration timer
 void sessionMngr::startSession(int type, int duration, int intensity){
 
     if(connectionTest()){
         qInfo("connection test worked");
         emit sessionStart();
-
+        batteryLifeTimer->start(1000); //the battery will decrease .01% every 1 seconds by default
 
         //creating session record at the start:
         session *currSession = new session(type, duration,intensity);
 
         //TODO: carry out session effect on UI
     }
+}
 
+// does not currently work need to change timer being used to a duration timer
+void sessionMngr::pauseSession() {
+    remainingTime = batteryLifeTimer->remainingTime();
+    batteryLifeTimer->stop();
+    qInfo() << "Session paused with " << remainingTime << " left";
+    sessionPaused = true;
+}
 
-
-
+void sessionMngr::unpauseSession() {
+    qInfo("Session unpaused");
+    emit sessionStart();
+    batteryLifeTimer->start(1000);
 }
 
 bool sessionMngr::connectionTest(){
@@ -123,4 +136,11 @@ void sessionMngr::setConnected(bool connection){
     connected = connection;
 }
 
+bool sessionMngr::isSessionPaused(){
+    return sessionPaused;
+}
+
+int sessionMngr::getRemainingTime() {
+    return remainingTime;
+}
 

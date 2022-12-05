@@ -1,15 +1,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
     //setup timers
     idleTimer = new QTimer();
-    batteryLifeTimer = new QTimer();
 
     //create manager
     mngr = new sessionMngr(this);
@@ -17,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     //connect slots
     connect(ui->powerButton, SIGNAL(released()), this, SLOT (togglePwr()));
     connect(idleTimer, SIGNAL(timeout()),this,SLOT (idleTimerExpired()));
-    connect(batteryLifeTimer, SIGNAL(timeout()),this,SLOT (batteryLifeTimerTick()));
+    connect(mngr->batteryLifeTimer, SIGNAL(timeout()),this,SLOT (batteryLifeTimerTick()));
     connect(ui->adminConnectedComboBox, SIGNAL(currentIndexChanged(int)),this,SLOT (updateConnection()));
     connect(ui->checkButton, SIGNAL(released()),this,SLOT (checkButtonPress()));
     connect(ui->upIntButton, SIGNAL(released()),this,SLOT (changeInstensity()));
@@ -28,15 +25,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     //init buttons / displays / battery
     isOn=false;
-    batteryLife=100;
-    ui->batteryLifeBar->setValue(batteryLife);
+    sessionInProgress = false;
+    batteryLife=99.99;
+    currIntensity = 0;
+    ui->adminBatterySpinBox->setValue(batteryLife);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
-
 
 void MainWindow::togglePwr(){
     //if the device is off and has power remaining, activate the power button light and set "isOn" true, start the idle timer and battery progress
@@ -48,24 +46,20 @@ void MainWindow::togglePwr(){
             isOn=true;
             ui->powrButtonLight->setStyleSheet("background-color:green");
             idleTimer->start(120000); //this will be set to 2 minutes
-            batteryLifeTimer->start(10000); //the battery will decrease 1% every 10 seconds
-            ui->batteryLifeBar->setValue(batteryLife);
         }
     }else {
         //if a session is in progress, end it properly before turning off
         if (sessionInProgress==true){
-            //endSession();
+            //endSession(); //will need to turn battery tick timer off in this function
             //saveReplay(); //not sure if these are going to be two separate functions
         } else {
             qInfo("Turning off");
             isOn=false;
             ui->powrButtonLight->setStyleSheet("background-color:white");
             idleTimer->stop();
-            batteryLifeTimer->stop();
         }
     }
 }
-
 
 void MainWindow::idleTimerExpired(){
     //we will impliment such that when a session is started, this timer is stopped so this function will not be called
@@ -74,30 +68,39 @@ void MainWindow::idleTimerExpired(){
 }
 
 void MainWindow::batteryLifeTimerTick(){
-    if (sessionInProgress==true){
-        //i will need to add more code here as battery decrease depends on the current current output
-        //we could also stop the battery timer and start it again with a faster interval depending on the current output, so basically
-        //  we could have it just lose 1% every 5 seconds instead of 1% every 10 seconds
-        batteryLife-=3;
-    } else{
-        batteryLife-=1;
-    }
+    //i will need to add more code here as battery decrease depends on the current current output
+    //we could also stop the battery timer and start it again with a faster interval depending on the current output, so basically
+    //we could have it just lose .01% every 1 seconds instead of 1% every 1 seconds
+    batteryLife -= (0.01 + (0.01 * currIntensity));
     //update the ui and handel dead battery behaviour
-    ui->batteryLifeBar->setValue(batteryLife);
-    if (batteryLife==0){
+    ui->adminBatterySpinBox->setValue(batteryLife);
+
+    if (batteryLife<=0){
         qInfo("Battery has died");
         togglePwr();
+        mngr->batteryLifeTimer->stop(); //replace one endSession() is done, should probably be done in sessionmngr
+        return;
     }
-
 }
 
 void MainWindow::updateConnection(){
-    if(ui->adminConnectedComboBox->currentIndex() == 0)
+    if(ui->adminConnectedComboBox->currentIndex() == 0) {
         mngr->setConnected(true);
-    else
+    }
+    //session is running and user disconnects ear clips
+    else if (sessionInProgress && ui->adminConnectedComboBox->currentIndex() == 1){
         mngr->setConnected(false);
+        mngr->pauseSession();
+    }
+    //reconnect ear clips from paused session
+    else if (mngr->isSessionPaused() && ui->adminConnectedComboBox->currentIndex() == 0) {
+        mngr->setConnected(true);
+        mngr->unpauseSession();
+    }
+    else{
+        mngr->setConnected(false);
+    }
 }
-
 
 void MainWindow::onSessionStart(){
     //the signal from session manager has informed the main window of session start, so update the members and stop the idleTimer
@@ -108,12 +111,14 @@ void MainWindow::onSessionStart(){
 
 void MainWindow::checkButtonPress(){
     //TO DO: we need to actually adjust the values here to pass
+
     int dur;
     if (ui->timeSelectionComboBox->currentIndex()==0){
         dur=20;
     }
-    mngr->startSession(dur,ui->sessionSelectionComboBox->currentIndex(),5);
+    ui->adminBatterySpinBox->setValue(batteryLife);
 
+    mngr->startSession(dur, ui->sessionSelectionComboBox->currentIndex(), 5); //passing temporary value must change this
 }
 
 void MainWindow::changeInstensity(){

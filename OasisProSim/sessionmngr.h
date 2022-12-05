@@ -7,31 +7,40 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QList>
+#include <QTimer>
+#include <QtDebug>
 
 class sessionMngr : public QObject
 {
     Q_OBJECT
 public:
+    QTimer* batteryLifeTimer;
     static const QString DATABASE_PATH;
     explicit sessionMngr(QObject *parent = nullptr);
+    bool connectionTest();
+    bool isSessionPaused();
+    int getRemainingTime();
     void startSession(int type, int duration, int intensity);
     void setConnected(bool connection);
     void addSessionRecord(const QString& user, const QString& sessionType, int duration, int intensityLevel);
     void addUserRecord(const QString &user);
+    void pauseSession();
+    void unpauseSession();
+
 
     bool deleteRecords();
     void displayRecords();
 private:
-    bool connectionTest();
+
     bool DBInit();
     bool connected;
     QSqlDatabase db;
     bool runningSession;
+    bool sessionPaused;
     bool isValidRecord(const QString& user, const QString& sessionType, int duration, int intensityLevel);
     QString sessionTypes[3] = { "Basic", "Middle", "Advanced" };
     const QString tempUser = "tempUser"; //use this for testing purposes
-
-
+    int remainingTime;
 
 public slots:
 
