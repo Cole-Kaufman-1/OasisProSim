@@ -725,7 +725,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="adminTab">
        <attribute name="title">
@@ -817,7 +817,17 @@
             </widget>
            </item>
            <item row="0" column="2">
-            <widget class="QDoubleSpinBox" name="adminBatterySpinBox"/>
+            <widget class="QDoubleSpinBox" name="adminBatterySpinBox">
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+             <property name="buttonSymbols">
+              <enum>QAbstractSpinBox::NoButtons</enum>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -900,21 +910,17 @@
                <number>5</number>
               </property>
               <item>
-               <widget class="QLabel" name="exampleReplayLabel">
-                <property name="font">
-                 <font>
-                  <pointsize>11</pointsize>
-                 </font>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <property name="text">
-                 <string>1 - Session Type: Delta  Duration: 20 Minutes, Intensity: 8 (example while working)</string>
-                </property>
-                <property name="wordWrap">
-                 <bool>true</bool>
-                </property>
+               <widget class="QComboBox" name="comboBox">
+                <item>
+                 <property name="text">
+                  <string>1 - Session Type: Delta  Duration: 20 Minutes, Intensity: 8 (example while working)</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>2 - Session Type: Delta  Duration: 20 Minutes, Intensity: 8 (example while working)</string>
+                 </property>
+                </item>
                </widget>
               </item>
               <item>
