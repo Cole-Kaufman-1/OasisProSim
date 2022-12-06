@@ -6,10 +6,10 @@
 class session
 {
 public:
-    session(int type, int duration, int intensity);
+    session (const QString &typeTreatment, int duration, int intensity);
 
 private:
-    int type;
+    QString type;
     int duration;
     int intensity;
 
