@@ -16,6 +16,12 @@ sessionMngr::sessionMngr(QObject *parent) : QObject(parent)
 
        if(!DBInit())
            throw "Error: Database has not been initialized";
+     
+       addSessionRecord("big","basicTreatment",10,5);
+       qInfo("got here");
+       session *temp = getSession("big","basicTreatment",10,5);
+       if(temp == nullptr)
+           qInfo("get record does not work");
 }
 
 //DB Initialization. Creates a couple of tables to utlise later. Specifically a table for treatment history and a table to track users
@@ -73,14 +79,33 @@ void sessionMngr::addUserRecord(const QString &user){
     query.exec();
     db.commit();
 }
+session* sessionMngr::getSession(const QString &user, const QString &sessionType, int duration, int intensityLevel){
 
-bool sessionMngr::isValidRecord(const QString &user, const QString &sessionType, int duration, int intensityLevel){
+    db.transaction();
+    QSqlQuery query;
+    query.prepare("SELECT * FROM treatmentHistory WHERE user LIKE :user AND sessionType LIKE :sessionType AND duration=:duration AND intensityLevel=:intensityLevel");
+   query.bindValue(":user", QString("%%1%").arg(user));
+   query.bindValue(":sessionType", QString("%%1%").arg(sessionType));
+   query.bindValue(":duration", duration);
+   query.bindValue(":intensityLevel", intensityLevel);
+   query.exec();
 
-    //TODO: add verification for records
-    return false;
+    if (!db.commit()) {
+        qInfo("querry did not work");
+    }
+    // profile does not exist
+    if (!query.next()) {
+        return nullptr;
+    }
+    else{
+        const QString type = query.value(0).toString();
+        const QString user = query.value(1).toString();
+        int dur = query.value(2).toInt();
+        int intense = query.value(3).toInt();
+        session* ret = new session(type,dur,intense);
+    }
 
 }
-
 bool sessionMngr::deleteRecords(){
     QSqlQuery query;
     query.prepare("DELETE FROM treatmentHistory");
@@ -93,7 +118,7 @@ bool sessionMngr::deleteRecords(){
 
 //TODO: we are mapping the type here as an int over to an array of chars. This makes it easier to work with FOR NOW...doesn't require string to int conversion. Will need to change later
 //TODO: add duration timer
-void sessionMngr::startSession(int type, int duration, int intensity){
+void sessionMngr::startSession(const QString &type, int duration, int intensity){
 
     if(connectionTest()){
         qInfo("connection test worked");
