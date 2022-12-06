@@ -86,7 +86,6 @@ session* sessionMngr::getSession(const QString &user, const QString &sessionType
     QSqlQuery query;
     query.prepare("SELECT * FROM treatmentHistory WHERE user LIKE :user AND sessionType LIKE :sessionType AND duration=:duration AND intensityLevel=:intensityLevel");
 
-
    query.bindValue(":user", user);
    query.bindValue(":sessionType",sessionType);
    query.bindValue(":duration", duration);
@@ -97,16 +96,18 @@ session* sessionMngr::getSession(const QString &user, const QString &sessionType
         qInfo("querry did not work");
     }
     // profile does not exist
-    if (!query.next()) {
-        return nullptr;
-    }
-    else{
-        const QString type = query.value(0).toString();
-        const QString user = query.value(1).toString();
-        int dur = query.value(2).toInt();
-        int intense = query.value(3).toInt();
-        session* ret = new session(type,dur,intense);
+    if (query.next()) {
+        const QString u = query.value(0).toString(); //not used in return since user info
+        const QString t = query.value(1).toString();
+        int d = query.value(2).toInt();
+        int i = query.value(3).toInt();
+        session* ret = new session(t,d,i);
         return ret;
+    }
+    //no result
+    else{
+        return nullptr;
+
     }
 
 }
