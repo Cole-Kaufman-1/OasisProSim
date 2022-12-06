@@ -151,3 +151,8 @@ void MainWindow::changeInstensity(){
         }
     }
 }
+
+void MainWindow::on_checkButton_2_clicked()
+{
+    defaultIntensity = currIntensity;
+}

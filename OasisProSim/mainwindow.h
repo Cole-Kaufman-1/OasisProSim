@@ -26,6 +26,7 @@ private:
     double batteryLife;
     bool sessionInProgress;
     int currIntensity;
+    int defaultIntensity;
 
     //members
     sessionMngr* mngr;
@@ -33,6 +34,8 @@ private:
 
 private slots:
     void togglePwr(); //turns device on and off
+
+    void on_checkButton_2_clicked();
 
 public slots:
     void idleTimerExpired(); //shuts device off if no session is started for 2 minutes after power on
