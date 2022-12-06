@@ -87,8 +87,8 @@ session* sessionMngr::getSession(const QString &user, const QString &sessionType
     query.prepare("SELECT * FROM treatmentHistory WHERE user LIKE :user AND sessionType LIKE :sessionType AND duration=:duration AND intensityLevel=:intensityLevel");
 
 
-   query.bindValue(":user", QString("%%1%").arg(user));
-   query.bindValue(":sessionType", QString("%%1%").arg(sessionType));
+   query.bindValue(":user", user);
+   query.bindValue(":sessionType",sessionType);
    query.bindValue(":duration", duration);
    query.bindValue(":intensityLevel", intensityLevel);
    query.exec();
@@ -110,6 +110,7 @@ session* sessionMngr::getSession(const QString &user, const QString &sessionType
     }
 
 }
+
 bool sessionMngr::deleteRecords(){
     QSqlQuery query;
     query.prepare("DELETE FROM treatmentHistory");
