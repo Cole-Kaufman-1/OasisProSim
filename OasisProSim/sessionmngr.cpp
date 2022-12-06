@@ -22,6 +22,9 @@ sessionMngr::sessionMngr(QObject *parent) : QObject(parent)
        session *temp = getSession("big","basicTreatment",10,5);
        if(temp == nullptr)
            qInfo("get record does not work");
+       else{
+           temp->print();
+       }
 }
 
 //DB Initialization. Creates a couple of tables to utlise later. Specifically a table for treatment history and a table to track users
@@ -83,7 +86,8 @@ session* sessionMngr::getSession(const QString &user, const QString &sessionType
 
     db.transaction();
     QSqlQuery query;
-    query.prepare("SELECT * FROM treatmentHistory WHERE user LIKE :user AND sessionType LIKE :sessionType AND duration=:duration AND intensityLevel=:intensityLevel");
+    query.prepare("SELECT * FROM treatmentHistory WHERE user LIKE :user AND sessionType LIKE :sessionType");
+
    query.bindValue(":user", QString("%%1%").arg(user));
    query.bindValue(":sessionType", QString("%%1%").arg(sessionType));
    query.bindValue(":duration", duration);
@@ -103,6 +107,7 @@ session* sessionMngr::getSession(const QString &user, const QString &sessionType
         int dur = query.value(2).toInt();
         int intense = query.value(3).toInt();
         session* ret = new session(type,dur,intense);
+        return ret;
     }
 
 }

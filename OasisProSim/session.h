@@ -7,7 +7,7 @@ class session
 {
 public:
     session (const QString &typeTreatment, int duration, int intensity);
-
+    void print();
 private:
     QString type;
     int duration;

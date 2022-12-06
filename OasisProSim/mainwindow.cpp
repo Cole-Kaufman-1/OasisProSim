@@ -118,7 +118,7 @@ void MainWindow::checkButtonPress(){
     }
     ui->adminBatterySpinBox->setValue(batteryLife);
 
-    mngr->startSession(dur, ui->sessionSelectionComboBox->currentIndex(), 5); //passing temporary value must change this
+    mngr->startSession("tempTreatment", ui->sessionSelectionComboBox->currentIndex(), 5); //passing temporary value must change this
 }
 
 void MainWindow::changeInstensity(){
