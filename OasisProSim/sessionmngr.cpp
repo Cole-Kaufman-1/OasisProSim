@@ -18,13 +18,11 @@ sessionMngr::sessionMngr(QObject *parent) : QObject(parent)
            throw "Error: Database has not been initialized";
      
        addSessionRecord("big","basicTreatment",10,5);
-       qInfo("got here");
        session *temp = getSession("big","basicTreatment",10,5);
        if(temp == nullptr)
            qInfo("get record does not work");
-       else{
+       else
            temp->print();
-       }
 }
 
 //DB Initialization. Creates a couple of tables to utlise later. Specifically a table for treatment history and a table to track users
@@ -86,7 +84,8 @@ session* sessionMngr::getSession(const QString &user, const QString &sessionType
 
     db.transaction();
     QSqlQuery query;
-    query.prepare("SELECT * FROM treatmentHistory WHERE user LIKE :user AND sessionType LIKE :sessionType");
+    query.prepare("SELECT * FROM treatmentHistory WHERE user LIKE :user AND sessionType LIKE :sessionType AND duration=:duration AND intensityLevel=:intensityLevel");
+
 
    query.bindValue(":user", QString("%%1%").arg(user));
    query.bindValue(":sessionType", QString("%%1%").arg(sessionType));
