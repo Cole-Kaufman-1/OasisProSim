@@ -20,7 +20,7 @@ public:
     bool connectionTest();
     bool isSessionPaused();
     int getRemainingTime();
-    void startSession(int type, int duration, int intensity);
+    void startSession(const QString &type, int duration, int intensity);
     void setConnected(bool connection);
     void addSessionRecord(const QString& user, const QString& sessionType, int duration, int intensityLevel);
     void addUserRecord(const QString &user);
@@ -37,7 +37,8 @@ private:
     QSqlDatabase db;
     bool runningSession;
     bool sessionPaused;
-    bool isValidRecord(const QString& user, const QString& sessionType, int duration, int intensityLevel);
+    session* getSession(const QString& user, const QString& sessionType, int duration, int intensityLevel);
+    session* loadSession(const QString& user, const QString& sessionType, int duration, int intensityLevel);
     QString sessionTypes[3] = { "Basic", "Middle", "Advanced" };
     const QString tempUser = "tempUser"; //use this for testing purposes
     int remainingTime;
