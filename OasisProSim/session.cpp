@@ -1,8 +1,8 @@
 #include "session.h"
 
-session::session(int type, int duration, int intensity)
+session::session(const QString &typeTreatment, int duration, int intensity)
 {
-    type = type;
+    type = typeTreatment;
     duration = duration;
     intensity = intensity;
 
