@@ -7,6 +7,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     //setup timers
     idleTimer = new QTimer();
+    softOffTimer = new QTimer();
+    softOnTimer = new QTimer();
 
     //create manager
     mngr = new sessionMngr(this);
@@ -19,15 +21,20 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(ui->checkButton, SIGNAL(released()),this,SLOT (checkButtonPress()));
     connect(ui->upIntButton, SIGNAL(released()),this,SLOT (changeInstensity()));
     connect(ui->downIntButton, SIGNAL(released()),this,SLOT (changeInstensity()));
+    connect(ui->checkButton_2, SIGNAL(released()),this,SLOT (setDefaultIntensity()));
+    connect(softOffTimer, SIGNAL(timeout()),this,SLOT (softOff()));
+    connect(softOnTimer, SIGNAL(timeout()),this,SLOT (softOn()));
 
     //connect siganls from sessionMngr to slots
     connect(mngr,SIGNAL(sessionStart()),this,SLOT (onSessionStart()));
+    connect(mngr,SIGNAL(sessionEnd()),this,SLOT (onSessionEnd()));
 
     //init buttons / displays / battery
     isOn=false;
     sessionInProgress = false;
     batteryLife=99.99;
     currIntensity = 0;
+    defaultIntensity = 1; //all sessions will set their intenstiy to this value unless changed manually
     ui->adminBatterySpinBox->setValue(batteryLife);
 }
 
@@ -50,11 +57,12 @@ void MainWindow::togglePwr(){
     }else {
         //if a session is in progress, end it properly before turning off
         if (sessionInProgress==true){
-            //endSession(); //will need to turn battery tick timer off in this function
-            //saveReplay(); //not sure if these are going to be two separate functions
+            mngr->endSession(); //will need to turn battery tick timer off in this function
+
         } else {
             qInfo("Turning off");
             isOn=false;
+            changeInstensity();
             ui->powrButtonLight->setStyleSheet("background-color:white");
             idleTimer->stop();
         }
@@ -68,9 +76,6 @@ void MainWindow::idleTimerExpired(){
 }
 
 void MainWindow::batteryLifeTimerTick(){
-    //i will need to add more code here as battery decrease depends on the current current output
-    //we could also stop the battery timer and start it again with a faster interval depending on the current output, so basically
-    //we could have it just lose .01% every 1 seconds instead of 1% every 1 seconds
     batteryLife -= (0.01 + (0.01 * currIntensity));
     //update the ui and handel dead battery behaviour
     ui->adminBatterySpinBox->setValue(batteryLife);
@@ -106,7 +111,50 @@ void MainWindow::onSessionStart(){
     //the signal from session manager has informed the main window of session start, so update the members and stop the idleTimer
     sessionInProgress=true;
     idleTimer->stop();
+    currIntensity=0;
+    softOnTimer->start(500);
+}
 
+void MainWindow::softOn(){
+    if (currIntensity==defaultIntensity){
+        changeInstensity();
+        softOnTimer->stop();
+        qInfo("soft on complete, enjoy the session");
+    }else{
+        changeInstensity();
+        currIntensity++;
+    }
+}
+
+
+void MainWindow::onSessionEnd(){
+    //update the recording intensity to match the current user selected intensity
+    session* currSess = mngr->getCurrentSession();
+    currSess->setIntensity(currIntensity);
+
+    //add the record to the database if the user choses to
+    if (ui->adminRecordReplayCheckBox->isChecked()){
+        mngr->addSessionRecord(ui->adminSelectUserComboBox->currentText(),currSess->getType(),currSess->getDuration(),currSess->getIntensity());
+        ui->replaysDropdown->addItem("newReplay");
+    }
+
+    //finally start the soft off process
+    currIntensity=8; //the intensity associated with the session will have already been saved, this is soley to visually show the soft off process
+    softOffTimer->start(500);
+}
+
+void MainWindow::softOff(){
+    if (currIntensity==0){
+        qInfo("soft off complete, powering off");
+        changeInstensity();
+        softOffTimer->stop();
+        sessionInProgress=false;
+        isOn=false;
+        ui->powrButtonLight->setStyleSheet("background-color:white");
+    } else {
+        changeInstensity();
+        currIntensity--;
+    }
 }
 
 void MainWindow::checkButtonPress(){
@@ -134,7 +182,6 @@ void MainWindow::changeInstensity(){
             }
         }
         //now set the three graphs on the UI to match the intensity
-        //gonna be a lot of ifs
         if (currIntensity<4){
             ui->top2Graphs->setValue(0);
             ui->middle3Graphs->setValue(0);
@@ -150,9 +197,17 @@ void MainWindow::changeInstensity(){
             ui->top2Graphs->setValue(currIntensity-6);
         }
     }
+    else { //this segment will reset the graphs to 0 when someone turns off the device suddenly and a session is NOT active
+        currIntensity=0;
+        ui->bottom3Graphs->setValue(0);
+        ui->middle3Graphs->setValue(0);
+        ui->top2Graphs->setValue(0);
+    }
 }
 
-void MainWindow::on_checkButton_2_clicked()
-{
+void MainWindow::setDefaultIntensity(){
     defaultIntensity = currIntensity;
+    qInfo("Default intensity updated to current intensity");
 }
+
+

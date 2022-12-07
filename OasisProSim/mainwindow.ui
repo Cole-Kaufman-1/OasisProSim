@@ -107,6 +107,9 @@
          <height>51</height>
         </rect>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QProgressBar::chunk { background-color: green}</string>
+       </property>
        <property name="maximum">
         <number>3</number>
        </property>
@@ -358,6 +361,9 @@
          <height>51</height>
         </rect>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QProgressBar::chunk { background-color: yellow}</string>
+       </property>
        <property name="maximum">
         <number>3</number>
        </property>
@@ -442,6 +448,9 @@
          <width>51</width>
          <height>41</height>
         </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QProgressBar::chunk { background-color: red}</string>
        </property>
        <property name="maximum">
         <number>2</number>
@@ -794,7 +803,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="adminTab">
        <attribute name="title">
@@ -858,9 +867,6 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="2">
-            <widget class="QComboBox" name="adminSelectUserComboBox"/>
-           </item>
            <item row="1" column="0">
             <widget class="QLabel" name="adminPowerLevelLabel">
              <property name="text">
@@ -911,20 +917,41 @@
            <item row="3" column="0">
             <widget class="QLabel" name="adminRecordReplayLabel">
              <property name="text">
-              <string>Record Replay</string>
+              <string>Record Replays</string>
              </property>
             </widget>
            </item>
            <item row="3" column="2">
-            <widget class="QPushButton" name="adminRecordReplayCheckButton">
-             <property name="font">
-              <font>
-               <pointsize>18</pointsize>
-              </font>
+            <widget class="QCheckBox" name="adminRecordReplayCheckBox">
+             <property name="layoutDirection">
+              <enum>Qt::LeftToRight</enum>
              </property>
              <property name="text">
-              <string>✓</string>
+              <string/>
              </property>
+            </widget>
+           </item>
+           <item row="2" column="2">
+            <widget class="QComboBox" name="adminSelectUserComboBox">
+             <property name="currentText">
+              <string>User1</string>
+             </property>
+             <property name="currentIndex">
+              <number>0</number>
+             </property>
+             <property name="minimumContentsLength">
+              <number>2</number>
+             </property>
+             <item>
+              <property name="text">
+               <string>User1</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>User2</string>
+              </property>
+             </item>
             </widget>
            </item>
           </layout>
@@ -1008,7 +1035,7 @@
                <number>5</number>
               </property>
               <item>
-               <widget class="QComboBox" name="comboBox">
+               <widget class="QComboBox" name="replaysDropdown">
                 <item>
                  <property name="text">
                   <string>1 - Session Type: Delta  Duration: 20 Minutes, Intensity: 8 (example while working)</string>

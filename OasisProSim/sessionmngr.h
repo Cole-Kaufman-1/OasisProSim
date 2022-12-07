@@ -15,6 +15,7 @@ class sessionMngr : public QObject
     Q_OBJECT
 public:
     QTimer* batteryLifeTimer;
+    QTimer* sessionTimer;
     static const QString DATABASE_PATH;
     explicit sessionMngr(QObject *parent = nullptr);
     bool connectionTest();
@@ -26,6 +27,8 @@ public:
     void addUserRecord(const QString &user);
     void pauseSession();
     void unpauseSession();
+    void endSession();
+    session* getCurrentSession();
 
 
     bool deleteRecords();
@@ -42,11 +45,14 @@ private:
     QString sessionTypes[3] = { "Basic", "Middle", "Advanced" };
     const QString tempUser = "tempUser"; //use this for testing purposes
     int remainingTime;
+    session *currSession;
 
 public slots:
+    void sessionTimerExpired();
 
 signals:
     void sessionStart();
+    void sessionEnd();
 };
 
 #endif // SESSIONMNGR_H

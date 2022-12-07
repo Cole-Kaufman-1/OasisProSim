@@ -31,19 +31,23 @@ private:
     //members
     sessionMngr* mngr;
     QTimer* idleTimer;
+    QTimer* softOffTimer;
+    QTimer* softOnTimer;
 
 private slots:
     void togglePwr(); //turns device on and off
-
-    void on_checkButton_2_clicked();
 
 public slots:
     void idleTimerExpired(); //shuts device off if no session is started for 2 minutes after power on
     void batteryLifeTimerTick(); //gradually decreases the remaining battery life
     void updateConnection();
     void onSessionStart();
+    void softOn();
+    void onSessionEnd();
+    void softOff();
     void checkButtonPress();
     void changeInstensity();
+    void setDefaultIntensity();
 
 
 };

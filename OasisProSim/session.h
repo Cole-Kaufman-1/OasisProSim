@@ -6,19 +6,30 @@
 class session
 {
 public:
-    session(const QString &typeTreatment, int d, int i)
+    session(const QString typeTreatment, int d, int i)
     {
-        type = typeTreatment;
+        type = "";
+        type.append(typeTreatment);
+       // type = typeTreatment;
         duration = d;
         intensity = i;
 
-    };
+    }
     void print();
-
-private:
     QString type;
     int duration;
     int intensity;
+
+    void setIntensity(int newIntensity);
+    void setDuration(int newDuration);
+
+    const QString getType();
+    int getIntensity();
+    int getDuration();
+
+
+private:
+
 };
 
 #endif // SESSION_H
