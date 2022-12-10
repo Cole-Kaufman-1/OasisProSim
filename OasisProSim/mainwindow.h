@@ -2,10 +2,12 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "QTimer"
-#include "QtGlobal"
+#include <QTimer>
+#include <QtGlobal>
 #include "sessionmngr.h"
 #include <string>
+#include <QDebug>
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -23,6 +25,7 @@ private:
 
     //member var
     bool isOn;
+    bool isConnected;
     double batteryLife;
     bool sessionInProgress;
     int currIntensity;
@@ -34,10 +37,15 @@ private:
     QTimer* softOffTimer;
     QTimer* softOnTimer;
 
+    //member methods
+    bool connectionTest();
+    void changeInstensityDisplay();
+
 private slots:
     void togglePwr(); //turns device on and off
 
 public slots:
+    void toggleElectrodes();
     void idleTimerExpired(); //shuts device off if no session is started for 2 minutes after power on
     void batteryLifeTimerTick(); //gradually decreases the remaining battery life
     void updateConnection();
@@ -47,6 +55,7 @@ public slots:
     void softOff();
     void checkButtonPress();
     void changeInstensity();
+    void changeInstensityAdmin(int);
     void setDefaultIntensity();
 
 

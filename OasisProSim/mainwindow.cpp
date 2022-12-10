@@ -18,10 +18,12 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(idleTimer, SIGNAL(timeout()),this,SLOT (idleTimerExpired()));
     connect(mngr->batteryLifeTimer, SIGNAL(timeout()),this,SLOT (batteryLifeTimerTick()));
     connect(ui->adminConnectedComboBox, SIGNAL(currentIndexChanged(int)),this,SLOT (updateConnection()));
+    connect(ui->connectElectrodeButton, SIGNAL(released()), this, SLOT(toggleElectrodes()));
     connect(ui->checkButton, SIGNAL(released()),this,SLOT (checkButtonPress()));
     connect(ui->upIntButton, SIGNAL(released()),this,SLOT (changeInstensity()));
     connect(ui->downIntButton, SIGNAL(released()),this,SLOT (changeInstensity()));
-    connect(ui->checkButton_2, SIGNAL(released()),this,SLOT (setDefaultIntensity()));
+    connect(ui->adminIntensityLevelspinBox, SIGNAL(valueChanged(int)), SLOT(changeInstensityAdmin(int)));
+    connect(ui->setDefaultIntensityButton, SIGNAL(released()),this,SLOT (setDefaultIntensity()));
     connect(softOffTimer, SIGNAL(timeout()),this,SLOT (softOff()));
     connect(softOnTimer, SIGNAL(timeout()),this,SLOT (softOn()));
 
@@ -30,12 +32,17 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(mngr,SIGNAL(sessionEnd()),this,SLOT (onSessionEnd()));
 
     //init buttons / displays / battery
-    isOn=false;
+    isOn = false;
     sessionInProgress = false;
-    batteryLife=99.99;
+    isConnected = false;
+    batteryLife = 99.99;
     currIntensity = 0;
     defaultIntensity = 1; //all sessions will set their intenstiy to this value unless changed manually
     ui->adminBatterySpinBox->setValue(batteryLife);
+    //init with start session button and increase intensity spin box off
+    ui->checkButton->setDisabled(true);
+    ui->adminIntensityLevelspinBox->setDisabled(true);
+
 }
 
 MainWindow::~MainWindow()
@@ -45,18 +52,24 @@ MainWindow::~MainWindow()
 
 void MainWindow::togglePwr(){
     //if the device is off and has power remaining, activate the power button light and set "isOn" true, start the idle timer and battery progress
-    if (isOn==false){
+    if (!isOn){
         if (batteryLife<=0){
             qInfo("Battery dead, Please charge");
         }else{
             qInfo("Turning on");
+            //enable start session button and increase intensity spin box since device turned on
+            ui->checkButton->setEnabled(true);
+            ui->adminIntensityLevelspinBox->setEnabled(true);
             isOn=true;
             ui->powrButtonLight->setStyleSheet("background-color:green");
             idleTimer->start(120000); //this will be set to 2 minutes
         }
     }else {
+        //disable start session button and intensity spin box since device turned off
+        ui->checkButton->setDisabled(true);
+        ui->adminIntensityLevelspinBox->setDisabled(true);
         //if a session is in progress, end it properly before turning off
-        if (sessionInProgress==true){
+        if (sessionInProgress){
             mngr->endSession(); //will need to turn battery tick timer off in this function
 
         } else {
@@ -77,33 +90,42 @@ void MainWindow::idleTimerExpired(){
 
 void MainWindow::batteryLifeTimerTick(){
     batteryLife -= (0.01 + (0.01 * currIntensity));
-    //update the ui and handel dead battery behaviour
+    //update the ui and handle dead battery behaviour
     ui->adminBatterySpinBox->setValue(batteryLife);
 
     if (batteryLife<=0){
         qInfo("Battery has died");
         togglePwr();
-        mngr->batteryLifeTimer->stop(); //replace one endSession() is done, should probably be done in sessionmngr
+        mngr->batteryLifeTimer->stop(); //replace once endSession() is done, should probably be done in sessionmngr
         return;
+    }
+}
+
+void MainWindow::toggleElectrodes() {
+    if (isConnected) {
+        ui->adminConnectedComboBox->setCurrentIndex(1);
+    }
+    else {
+        ui->adminConnectedComboBox->setCurrentIndex(0);
     }
 }
 
 void MainWindow::updateConnection(){
     if(ui->adminConnectedComboBox->currentIndex() == 0) {
-        mngr->setConnected(true);
+        isConnected = true;
     }
     //session is running and user disconnects ear clips
     else if (sessionInProgress && ui->adminConnectedComboBox->currentIndex() == 1){
-        mngr->setConnected(false);
+        isConnected = false;
         mngr->pauseSession();
     }
     //reconnect ear clips from paused session
     else if (mngr->isSessionPaused() && ui->adminConnectedComboBox->currentIndex() == 0) {
-        mngr->setConnected(true);
+        isConnected = true;;
         mngr->unpauseSession();
     }
     else{
-        mngr->setConnected(false);
+        isConnected = false;
     }
 }
 
@@ -166,48 +188,78 @@ void MainWindow::checkButtonPress(){
     }
     ui->adminBatterySpinBox->setValue(batteryLife);
 
-    mngr->startSession("tempTreatment", ui->sessionSelectionComboBox->currentIndex(), 5); //passing temporary value must change this
+    if (connectionTest()) {
+        mngr->startSession("tempTreatment", ui->sessionSelectionComboBox->currentIndex(), 5); //passing temporary value must change this
+    }
+}
+
+bool MainWindow::connectionTest(){
+    //need to expand on this later by displaying according to the manual
+
+    //inform console of connection state
+    QString connectionResult = isConnected ? "device probes are connected" : "not connected, try again";
+    qInfo() << connectionResult;
+    return isConnected;
 }
 
 void MainWindow::changeInstensity(){
-    if (isOn==true){
+    if (isOn){
         if (sender()==ui->upIntButton){
             if (currIntensity<8){
                 currIntensity++;
             }
-        } else
-        if (sender()==ui->downIntButton){
+        }
+        else if (sender()==ui->downIntButton){
             if (currIntensity>0){
                 currIntensity--;
             }
         }
         //now set the three graphs on the UI to match the intensity
-        if (currIntensity<4){
-            ui->top2Graphs->setValue(0);
-            ui->middle3Graphs->setValue(0);
-            ui->bottom3Graphs->setValue(currIntensity);
-        } else
-        if (currIntensity<7){
-            ui->bottom3Graphs->setValue(3);
-            ui->middle3Graphs->setValue(currIntensity-3);
-            ui->top2Graphs->setValue(0);
-        } else {
-            ui->bottom3Graphs->setValue(3);
-            ui->middle3Graphs->setValue(3);
-            ui->top2Graphs->setValue(currIntensity-6);
-        }
+        changeInstensityDisplay();
+
+        //block signal temporarily while setting new intensity value (prevents intensity setting loop between spin box and buttons)
+        ui->adminIntensityLevelspinBox->blockSignals(true);
+        ui->adminIntensityLevelspinBox->setValue(currIntensity);
+        ui->adminIntensityLevelspinBox->blockSignals(false);
     }
     else { //this segment will reset the graphs to 0 when someone turns off the device suddenly and a session is NOT active
         currIntensity=0;
+        ui->adminIntensityLevelspinBox->setValue(currIntensity);
         ui->bottom3Graphs->setValue(0);
         ui->middle3Graphs->setValue(0);
         ui->top2Graphs->setValue(0);
     }
 }
 
+void MainWindow::changeInstensityDisplay() {
+    if (currIntensity<4){
+        ui->top2Graphs->setValue(0);
+        ui->middle3Graphs->setValue(0);
+        ui->bottom3Graphs->setValue(currIntensity);
+    }
+    else if (currIntensity<7){
+        ui->bottom3Graphs->setValue(3);
+        ui->middle3Graphs->setValue(currIntensity-3);
+        ui->top2Graphs->setValue(0);
+    }
+    else {
+        ui->bottom3Graphs->setValue(3);
+        ui->middle3Graphs->setValue(3);
+        ui->top2Graphs->setValue(currIntensity-6);
+    }
+}
+
+void MainWindow::changeInstensityAdmin(int newVal) {
+    if (newVal > currIntensity){
+        currIntensity++;
+    }
+    else {
+        currIntensity--;
+    }
+    changeInstensityDisplay();
+}
+
 void MainWindow::setDefaultIntensity(){
     defaultIntensity = currIntensity;
     qInfo("Default intensity updated to current intensity");
 }
-
-

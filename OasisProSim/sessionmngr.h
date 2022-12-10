@@ -18,11 +18,9 @@ public:
     QTimer* sessionTimer;
     static const QString DATABASE_PATH;
     explicit sessionMngr(QObject *parent = nullptr);
-    bool connectionTest();
     bool isSessionPaused();
     int getRemainingTime();
     void startSession(const QString &type, int duration, int intensity);
-    void setConnected(bool connection);
     void addSessionRecord(const QString& user, const QString& sessionType, int duration, int intensityLevel);
     void addUserRecord(const QString &user);
     void pauseSession();
@@ -36,7 +34,6 @@ public:
 private:
 
     bool DBInit();
-    bool connected;
     QSqlDatabase db;
     bool runningSession;
     bool sessionPaused;

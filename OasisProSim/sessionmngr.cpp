@@ -133,22 +133,19 @@ bool sessionMngr::deleteRecords(){
 //TODO: we are mapping the type here as an int over to an array of chars. This makes it easier to work with FOR NOW...doesn't require string to int conversion. Will need to change later
 void sessionMngr::startSession(const QString &type, int duration, int intensity){
 
-    if(connectionTest()){
-        qInfo("connection test worked");
-        emit sessionStart();
-        batteryLifeTimer->start(1000); //the battery will decrease .01% every 1 seconds by default
+    qInfo("connection test worked");
+    emit sessionStart();
+    batteryLifeTimer->start(1000); //the battery will decrease .01% every 1 seconds by default
 
-        //creating session record at the start:
-        currSession = new session(type, duration,intensity);
+    //creating session record at the start:
+    currSession = new session(type, duration,intensity);
 
-        //starting session timer
-        if (duration==0){
-            sessionTimer->start(20000); //simulating 20 minutes as 20 seconds
-        } else if (duration==1){
-            sessionTimer->start(45000);
-        } //TODO: need to add the last else here for user designated time
-
-    }
+    //starting session timer
+    if (duration==0){
+        sessionTimer->start(20000); //simulating 20 minutes as 20 seconds
+    } else if (duration==1){
+        sessionTimer->start(45000);
+    } //TODO: need to add the last else here for user designated time
 }
 
 // does not currently work need to change timer being used to a duration timer
@@ -166,20 +163,6 @@ void sessionMngr::unpauseSession() {
     sessionTimer->start(remainingTime);
     sessionPaused = false;
 
-}
-
-bool sessionMngr::connectionTest(){
-    //need to expand on this later
-    if(this->connected==true){
-        return true;
-    }else{
-        qInfo("not connected, try again");
-        return false;
-    }
-}
-
-void sessionMngr::setConnected(bool connection){
-    connected = connection;
 }
 
 bool sessionMngr::isSessionPaused(){
