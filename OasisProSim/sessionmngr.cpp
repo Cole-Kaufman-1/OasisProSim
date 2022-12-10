@@ -135,17 +135,11 @@ void sessionMngr::startSession(const QString &type, int duration, int intensity)
 
     qInfo("connection test worked");
     emit sessionStart();
-    batteryLifeTimer->start(1000); //the battery will decrease .01% every 1 seconds by default
-
     //creating session record at the start:
-    currSession = new session(type, duration,intensity);
-
-    //starting session timer
-    if (duration==0){
-        sessionTimer->start(20000); //simulating 20 minutes as 20 seconds
-    } else if (duration==1){
-        sessionTimer->start(45000);
-    } //TODO: need to add the last else here for user designated time
+    currSession = new session(type, duration, intensity);
+    //given duration * 1000 to convert to second
+    sessionTimer->start(duration * 1000);
+    batteryLifeTimer->start(1000); //the battery will decrease .01% every 1 seconds by default
 }
 
 // does not currently work need to change timer being used to a duration timer

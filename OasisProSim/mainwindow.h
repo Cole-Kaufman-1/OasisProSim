@@ -40,6 +40,7 @@ private:
     //member methods
     bool connectionTest();
     void changeInstensityDisplay();
+    int getTimeSelection();
 
 private slots:
     void togglePwr(); //turns device on and off
@@ -57,6 +58,7 @@ public slots:
     void changeInstensity();
     void changeInstensityAdmin(int);
     void setDefaultIntensity();
+    void rechargeBattery();
 
 
 };

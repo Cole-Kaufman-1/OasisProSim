@@ -14,18 +14,19 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     mngr = new sessionMngr(this);
 
     //connect slots
-    connect(ui->powerButton, SIGNAL(released()), this, SLOT (togglePwr()));
-    connect(idleTimer, SIGNAL(timeout()),this,SLOT (idleTimerExpired()));
-    connect(mngr->batteryLifeTimer, SIGNAL(timeout()),this,SLOT (batteryLifeTimerTick()));
-    connect(ui->adminConnectedComboBox, SIGNAL(currentIndexChanged(int)),this,SLOT (updateConnection()));
+    connect(ui->powerButton, SIGNAL(released()), this, SLOT(togglePwr()));
+    connect(idleTimer, SIGNAL(timeout()), this, SLOT(idleTimerExpired()));
+    connect(mngr->batteryLifeTimer, SIGNAL(timeout()), this, SLOT(batteryLifeTimerTick()));
+    connect(ui->adminConnectedComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateConnection()));
     connect(ui->connectElectrodeButton, SIGNAL(released()), this, SLOT(toggleElectrodes()));
-    connect(ui->checkButton, SIGNAL(released()),this,SLOT (checkButtonPress()));
-    connect(ui->upIntButton, SIGNAL(released()),this,SLOT (changeInstensity()));
-    connect(ui->downIntButton, SIGNAL(released()),this,SLOT (changeInstensity()));
+    connect(ui->checkButton, SIGNAL(released()), this, SLOT(checkButtonPress()));
+    connect(ui->upIntButton, SIGNAL(released()), this, SLOT(changeInstensity()));
+    connect(ui->downIntButton, SIGNAL(released()),this, SLOT(changeInstensity()));
     connect(ui->adminIntensityLevelspinBox, SIGNAL(valueChanged(int)), SLOT(changeInstensityAdmin(int)));
-    connect(ui->setDefaultIntensityButton, SIGNAL(released()),this,SLOT (setDefaultIntensity()));
-    connect(softOffTimer, SIGNAL(timeout()),this,SLOT (softOff()));
-    connect(softOnTimer, SIGNAL(timeout()),this,SLOT (softOn()));
+    connect(ui->setDefaultIntensityButton, SIGNAL(released()), this, SLOT(setDefaultIntensity()));
+    connect(softOffTimer, SIGNAL(timeout()), this, SLOT(softOff()));
+    connect(softOnTimer, SIGNAL(timeout()), this, SLOT(softOn()));
+    connect(ui->adminBatteryRecharge, SIGNAL(released()), this, SLOT(rechargeBattery()));
 
     //connect siganls from sessionMngr to slots
     connect(mngr,SIGNAL(sessionStart()),this,SLOT (onSessionStart()));
@@ -179,17 +180,24 @@ void MainWindow::softOff(){
     }
 }
 
+int MainWindow::getTimeSelection() {
+    if (ui->timeSelectionComboBox->currentIndex() == 0){
+        return 20;
+    }
+    else if(ui->timeSelectionComboBox->currentIndex() == 1) {
+        return 45;
+    }
+    else {
+        return ui->userDesignatedSpinBox->value();
+    }
+}
+
 void MainWindow::checkButtonPress(){
     //TO DO: we need to actually adjust the values here to pass
-
-    int dur;
-    if (ui->timeSelectionComboBox->currentIndex()==0){
-        dur=20;
-    }
-    ui->adminBatterySpinBox->setValue(batteryLife);
-
+    QString sessionType = ui->sessionSelectionComboBox->currentText();
+    int duration = getTimeSelection();
     if (connectionTest()) {
-        mngr->startSession("tempTreatment", ui->sessionSelectionComboBox->currentIndex(), 5); //passing temporary value must change this
+        mngr->startSession(sessionType, duration, defaultIntensity);
     }
 }
 
@@ -262,4 +270,10 @@ void MainWindow::changeInstensityAdmin(int newVal) {
 void MainWindow::setDefaultIntensity(){
     defaultIntensity = currIntensity;
     qInfo("Default intensity updated to current intensity");
+}
+
+void MainWindow::rechargeBattery() {
+    batteryLife = 99.99;
+    ui->adminBatterySpinBox->setValue(batteryLife);
+    qInfo() << "Battery recharged";
 }
