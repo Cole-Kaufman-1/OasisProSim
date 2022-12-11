@@ -175,7 +175,6 @@ void sessionMngr::unpauseSession() {
     batteryLifeTimer->start(1000);
     sessionTimer->start(remainingTime);
     sessionPaused = false;
-
 }
 
 bool sessionMngr::isSessionPaused(){

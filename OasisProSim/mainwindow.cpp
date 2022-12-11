@@ -116,8 +116,9 @@ void MainWindow::toggleElectrodes() {
 }
 
 void MainWindow::updateConnection(){
-    if(ui->adminConnectedComboBox->currentIndex() == 0) {
+    if(mngr->isSessionPaused() && ui->adminConnectedComboBox->currentIndex() == 0) {
         isConnected = true;
+        mngr->unpauseSession();
     }
     //session is running and user disconnects ear clips
     else if (sessionInProgress && ui->adminConnectedComboBox->currentIndex() == 1){
@@ -125,9 +126,8 @@ void MainWindow::updateConnection(){
         mngr->pauseSession();
     }
     //reconnect ear clips from paused session
-    else if (mngr->isSessionPaused() && ui->adminConnectedComboBox->currentIndex() == 0) {
+    else if (ui->adminConnectedComboBox->currentIndex() == 0) {
         isConnected = true;;
-        mngr->unpauseSession();
     }
     else{
         isConnected = false;
