@@ -30,6 +30,7 @@ private:
     bool sessionInProgress;
     int currIntensity;
     int defaultIntensity;
+    QString currUser;
 
     //members
     sessionMngr* mngr;
@@ -41,6 +42,7 @@ private:
     bool connectionTest();
     void changeInstensityDisplay();
     int getTimeSelection();
+    void setUserSessions();
 
 private slots:
     void togglePwr(); //turns device on and off
@@ -59,6 +61,8 @@ public slots:
     void changeInstensityAdmin(int);
     void setDefaultIntensity();
     void rechargeBattery();
+    void changeUser(QString user);
+    void setReplayValues();
 
 
 };

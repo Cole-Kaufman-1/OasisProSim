@@ -27,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(softOffTimer, SIGNAL(timeout()), this, SLOT(softOff()));
     connect(softOnTimer, SIGNAL(timeout()), this, SLOT(softOn()));
     connect(ui->adminBatteryRecharge, SIGNAL(released()), this, SLOT(rechargeBattery()));
+    connect(ui->adminSelectUserComboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(changeUser(QString)));
+    connect(ui->selectReplayButton, SIGNAL(released()), this, SLOT(setReplayValues()));
 
     //connect siganls from sessionMngr to slots
     connect(mngr,SIGNAL(sessionStart()),this,SLOT (onSessionStart()));
@@ -36,6 +38,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     isOn = false;
     sessionInProgress = false;
     isConnected = false;
+    currUser = ui->adminSelectUserComboBox->currentText();
+    setUserSessions();
     batteryLife = 99.99;
     currIntensity = 0;
     defaultIntensity = 1; //all sessions will set their intenstiy to this value unless changed manually
@@ -130,12 +134,42 @@ void MainWindow::updateConnection(){
     }
 }
 
+void MainWindow::changeUser(QString user) {
+    currUser = user;
+    setUserSessions();
+}
+
+void MainWindow::setUserSessions() {
+    QStringList userSessions =  mngr->getUserSessions(currUser);
+    ui->replaysDropdown->clear();
+    ui->replaysDropdown->addItems(userSessions);
+}
+
 void MainWindow::onSessionStart(){
     //the signal from session manager has informed the main window of session start, so update the members and stop the idleTimer
     sessionInProgress=true;
     idleTimer->stop();
     currIntensity=0;
     softOnTimer->start(500);
+}
+
+void MainWindow::setReplayValues() {
+    QString sessionNum = ui->replaysDropdown->currentText().at(0);
+    Session* tempSession = mngr->getSession(sessionNum.toInt());
+    ui->sessionSelectionComboBox->setCurrentText(Session::sessionTypes.at(tempSession->getType()));
+    if (tempSession->getDuration() == 20){
+        ui->timeSelectionComboBox->setCurrentIndex(0);
+    }
+    else if(tempSession->getDuration() == 45) {
+        ui->timeSelectionComboBox->setCurrentIndex(1);
+    }
+    else {
+        ui->timeSelectionComboBox->setCurrentIndex(2);
+        ui->userDesignatedSpinBox->setValue(tempSession->getDuration());
+    }
+    defaultIntensity = tempSession->getIntensity();
+    qInfo("Recording values set, start a new session as normal");
+
 }
 
 void MainWindow::softOn(){
@@ -151,16 +185,12 @@ void MainWindow::softOn(){
 
 
 void MainWindow::onSessionEnd(){
-    //update the recording intensity to match the current user selected intensity
-    session* currSess = mngr->getCurrentSession();
-    currSess->setIntensity(currIntensity);
-
     //add the record to the database if the user choses to
     if (ui->adminRecordReplayCheckBox->isChecked()){
-        mngr->addSessionRecord(ui->adminSelectUserComboBox->currentText(),currSess->getType(),currSess->getDuration(),currSess->getIntensity());
-        ui->replaysDropdown->addItem("newReplay");
+        mngr->addSessionRecord(currIntensity);
+        setUserSessions();
     }
-
+    ui->adminSelectUserComboBox->setEnabled(true);
     //finally start the soft off process
     currIntensity=8; //the intensity associated with the session will have already been saved, this is soley to visually show the soft off process
     softOffTimer->start(500);
@@ -194,10 +224,11 @@ int MainWindow::getTimeSelection() {
 
 void MainWindow::checkButtonPress(){
     //TO DO: we need to actually adjust the values here to pass
-    QString sessionType = ui->sessionSelectionComboBox->currentText();
-    int duration = getTimeSelection();
-    if (connectionTest()) {
-        mngr->startSession(sessionType, duration, defaultIntensity);
+    if (!sessionInProgress && connectionTest() && isOn) {
+        int sessionType = ui->sessionSelectionComboBox->currentIndex();
+        int duration = getTimeSelection();
+        mngr->startSession(ui->adminSelectUserComboBox->currentText(), sessionType, duration, defaultIntensity);
+        ui->adminSelectUserComboBox->setDisabled(true);
     }
 }
 

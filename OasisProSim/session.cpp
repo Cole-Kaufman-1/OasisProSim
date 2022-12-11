@@ -1,27 +1,47 @@
 #include "session.h"
+#include <QDebug>
 
-void session::print(){
-    qInfo("session type is %s\n",type);
-    qInfo("duration is%d\n",duration);
-    qInfo("intensity is%d\n",intensity);
+const QStringList Session::sessionTypes = {"Delta", "Theta", "Alpha", "Beta 1"};
+
+
+Session::Session(QString user, int type, int duration, int intensity):
+    user(user), type(type), duration(duration), intensity(intensity) {}
+
+void Session::print(){
+    qInfo() << "User: " << user;
+    qInfo() << "Session Type: " << sessionTypes.at(type);
+    qInfo() << "Duration: " << duration;
+    qInfo() << "Intensity: " << intensity;
 }
 
-void session::setIntensity(int newIntensity){
+void Session::setIntensity(int newIntensity){
     intensity = newIntensity;
 }
 
-void session::setDuration(int newDuration){
+void Session::setDuration(int newDuration){
     duration = newDuration;
 }
 
-const QString session::getType(){
+int Session::getType(){
     return type;
 }
 
-int session::getIntensity(){
+void Session::setType(int newType){
+    type = newType;
+}
+
+int Session::getIntensity(){
     return intensity;
 }
 
-int session::getDuration(){
+int Session::getDuration(){
     return duration;
+}
+
+void Session::setUser(QString newUser) {
+    user = newUser;
+}
+
+QString Session::getUser() {
+    return user;
 }

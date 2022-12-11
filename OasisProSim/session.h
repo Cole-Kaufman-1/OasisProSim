@@ -3,33 +3,26 @@
 
 #include <QString>
 
-class session
+class Session
 {
 public:
-    session(const QString typeTreatment, int d, int i)
-    {
-        type = "";
-        type.append(typeTreatment);
-       // type = typeTreatment;
-        duration = d;
-        intensity = i;
-
-    }
-    void print();
-    QString type;
-    int duration;
-    int intensity;
-
-    void setIntensity(int newIntensity);
-    void setDuration(int newDuration);
-
-    const QString getType();
+    Session(const QString user, int type, int dur, int intensity);
+    void setIntensity(int intensity);
+    void setUser(QString user);
+    void setDuration(int dur);
+    void setType(int type);
+    int getType();
     int getIntensity();
     int getDuration();
-
+    QString getUser();
+    void print();
+    const static QStringList sessionTypes;
 
 private:
-
+    QString user;
+    int duration;
+    int intensity;
+    int type;
 };
 
 #endif // SESSION_H

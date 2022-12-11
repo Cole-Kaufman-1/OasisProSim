@@ -20,29 +20,26 @@ public:
     explicit sessionMngr(QObject *parent = nullptr);
     bool isSessionPaused();
     int getRemainingTime();
-    void startSession(const QString &type, int duration, int intensity);
-    void addSessionRecord(const QString& user, const QString& sessionType, int duration, int intensityLevel);
+    void startSession(QString user,int sessionType, int duration, int intensity);
+    void addSessionRecord(int currIntensity);
     void addUserRecord(const QString &user);
+    QStringList getUserSessions(QString user);
     void pauseSession();
     void unpauseSession();
     void endSession();
-    session* getCurrentSession();
-
+    Session* getCurrentSession();
+    Session* getSession(int sessionNum);
 
     bool deleteRecords();
     void displayRecords();
 private:
-
     bool DBInit();
     QSqlDatabase db;
     bool runningSession;
     bool sessionPaused;
-    session* getSession(const QString& user, const QString& sessionType, int duration, int intensityLevel);
-    session* loadSession(const QString& user, const QString& sessionType, int duration, int intensityLevel);
-    QString sessionTypes[3] = { "Basic", "Middle", "Advanced" };
     const QString tempUser = "tempUser"; //use this for testing purposes
     int remainingTime;
-    session *currSession;
+    Session *currSession;
 
 public slots:
     void sessionTimerExpired();
