@@ -234,10 +234,14 @@ void MainWindow::checkButtonPress(){
 
 bool MainWindow::connectionTest(){
     //need to expand on this later by displaying according to the manual
+    currIntensity = 8;
+    changeInstensityDisplay();
+    ui->connectElectrodeButton->setStyleSheet("background-color:white");
 
     //inform console of connection state
     QString connectionResult = isConnected ? "device probes are connected" : "not connected, try again";
     qInfo() << connectionResult;
+
     return isConnected;
 }
 
