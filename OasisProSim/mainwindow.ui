@@ -636,34 +636,6 @@
         <string/>
        </property>
       </widget>
-      <widget class="QPushButton" name="shortPulseButtonLight">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>490</x>
-         <y>10</y>
-         <width>71</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-       <property name="text">
-        <string>Short Pulse</string>
-       </property>
-       <property name="checkable">
-        <bool>false</bool>
-       </property>
-       <property name="default">
-        <bool>false</bool>
-       </property>
-       <property name="flat">
-        <bool>false</bool>
-       </property>
-      </widget>
       <widget class="QSpinBox" name="userDesignatedSpinBox">
        <property name="geometry">
         <rect>
@@ -798,7 +770,6 @@
       <zorder>sessionSelectionComboBox</zorder>
       <zorder>connectElectrodeLabel</zorder>
       <zorder>connectElectrodeButton</zorder>
-      <zorder>shortPulseButtonLight</zorder>
       <zorder>userDesignatedSpinBox</zorder>
       <zorder>userDesignatedLabel</zorder>
       <zorder>setDefaultIntensityButton</zorder>
