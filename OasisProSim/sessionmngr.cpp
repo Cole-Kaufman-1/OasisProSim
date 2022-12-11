@@ -37,27 +37,6 @@ bool sessionMngr::DBInit(){
     return db.commit();
 }
 
-/*TODO: this function needs some updating - the display is not functioning as expected - we can see properly in terminal but not in output...
- * must re-write if we need it
-void sessionMngr::displayRecords() {
-
-    QList<QString>* records = new QList<QString>;
-
-    QSqlQuery query;
-    query.exec("SELECT * FROM treatmentHistory");
-    while (query.next()) {
-        qInfo("%s",query.value(0).toString().toStdString());
-    }
-
-    QSqlQuery userQuery;
-
-    userQuery.exec("SELECT * FROM users");
-    while (query.next()) {
-        qInfo("%s",userQuery.value(0).toString());
-    }
-
-}
-*/
 
 void sessionMngr::addSessionRecord(int intensityLevel){
 
@@ -149,7 +128,7 @@ bool sessionMngr::deleteRecords(){
 }
 
 
-//TODO: we are mapping the type here as an int over to an array of chars. This makes it easier to work with FOR NOW...doesn't require string to int conversion. Will need to change later
+
 void sessionMngr::startSession(QString user, int sessionType, int duration, int intensity){
 
     qInfo("connection test worked");
