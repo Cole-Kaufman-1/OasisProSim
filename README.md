@@ -15,7 +15,7 @@
 - Jeremy Pierce-Lord
   - UI
   - Program Logic
-All
+- All
  - Program Design
  
 ## File Organization:
