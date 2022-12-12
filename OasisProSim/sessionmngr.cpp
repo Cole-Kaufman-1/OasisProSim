@@ -24,6 +24,10 @@ sessionMngr::sessionMngr(QObject *parent) : QObject(parent) {
     connect(sessionTimer, SIGNAL(timeout()),this,SLOT (sessionTimerExpired()));
 }
 
+sessionMngr::~sessionMngr() {
+    delete currSession;
+}
+
 Session* sessionMngr::getCurrentSession(){
     return currSession;
 }

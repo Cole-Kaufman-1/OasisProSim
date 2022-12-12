@@ -14,30 +14,29 @@ class sessionMngr : public QObject
 {
     Q_OBJECT
 public:
-    QTimer* batteryLifeTimer;
-    QTimer* sessionTimer;
+    QTimer* batteryLifeTimer; //timer for ticking batter
+    QTimer* sessionTimer; //overall session timer
     static const QString DATABASE_PATH;
     explicit sessionMngr(QObject *parent = nullptr);
+    ~sessionMngr();
     bool isSessionPaused();
     int getRemainingTime();
-    void startSession(QString user,int sessionType, int duration, int intensity);
-    void addSessionRecord(int currIntensity);
+    void startSession(QString user,int sessionType, int duration, int intensity); //called when a session is started and the user wants to record it
+    void addSessionRecord(int currIntensity);//called when a session ends and the user wants to record it
     void addUserRecord(const QString &user);
-    QStringList getUserSessions(QString user);
+    QStringList getUserSessions(QString user); //gets a user's recorded sessions for display
     void pauseSession();
     void unpauseSession();
     void endSession();
-    Session* getCurrentSession();
-    Session* getSession(int sessionNum);
-
+    Session* getCurrentSession(); //returns current session object
+    Session* getSession(int sessionNum); //gets a session from the database when a user wants to use a recording
     bool deleteRecords();
-    void displayRecords();
+
 private:
     bool DBInit();
     QSqlDatabase db;
     bool runningSession;
     bool sessionPaused;
-    const QString tempUser = "tempUser"; //use this for testing purposes
     int remainingTime;
     Session *currSession;
 

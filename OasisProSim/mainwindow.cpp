@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     idleTimer = new QTimer();
     softOffTimer = new QTimer();
     softOnTimer = new QTimer();
+    lowBatteryTimer = new QTimer();
 
     //create manager
     mngr = new sessionMngr(this);
@@ -29,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(ui->adminBatteryRecharge, SIGNAL(released()), this, SLOT(rechargeBattery()));
     connect(ui->adminSelectUserComboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(changeUser(QString)));
     connect(ui->selectReplayButton, SIGNAL(released()), this, SLOT(setReplayValues()));
+    connect(lowBatteryTimer, SIGNAL(timeout()), this, SLOT(batteryBlink()));
 
     //connect siganls from sessionMngr to slots
     connect(mngr,SIGNAL(sessionStart()),this,SLOT (onSessionStart()));
@@ -42,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     setUserSessions();
     batteryLife = 99.99;
     currIntensity = 0;
+    blinkCount = 0;
     defaultIntensity = 1; //all sessions will set their intenstiy to this value unless changed manually
     ui->adminBatterySpinBox->setValue(batteryLife);
     //init with start session button and increase intensity spin box off
@@ -53,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete mngr;
 }
 
 void MainWindow::togglePwr(){
@@ -61,7 +65,7 @@ void MainWindow::togglePwr(){
         if (batteryLife<=0){
             qInfo("Battery dead, Please charge");
         }else{
-            qInfo("Turning on");
+            qInfo("Turning ontrue;");
             //enable start session button and increase intensity spin box since device turned on
             ui->checkButton->setEnabled(true);
             ui->adminIntensityLevelspinBox->setEnabled(true);
@@ -70,6 +74,8 @@ void MainWindow::togglePwr(){
             idleTimer->start(120000); //this will be set to 2 minutes
         }
     }else {
+        //battery timer blinks only occur once per session
+        batteryWarningGiven = criticalBatteryWarningGiven = false;
         //disable start session button and intensity spin box since device turned off
         ui->checkButton->setDisabled(true);
         ui->adminIntensityLevelspinBox->setDisabled(true);
@@ -98,13 +104,48 @@ void MainWindow::batteryLifeTimerTick(){
     //update the ui and handle dead battery behaviour
     ui->adminBatterySpinBox->setValue(batteryLife);
 
-    if (batteryLife<=0){
+    //critical low battery blink
+    if (batteryLife <= 10 && !criticalBatteryWarningGiven) {
+        qInfo() << "Critical battery power blinking";
+        lowBatteryTimer->start(1000);
+        criticalBatteryWarningGiven = true;
+    }
+    //regular low battery blink
+    else if (batteryLife <= 20 && !batteryWarningGiven) {
+        qInfo() << "Low battery power blinking";
+        lowBatteryTimer->start(1000);
+        batteryWarningGiven = true;
+    }
+    else if (batteryLife<=0){
         qInfo("Battery has died");
         togglePwr();
         mngr->batteryLifeTimer->stop(); //replace once endSession() is done, should probably be done in sessionmngr
         return;
     }
+
 }
+
+void MainWindow::batteryBlink() {
+    if (blinkCount < 5) {
+        blinkCount++;
+        ui->top2Graphs->setValue(0);
+        ui->middle3Graphs->setValue(0);
+        if (batteryLife <= 10) {
+            ui->bottom3Graphs->setValue(1);
+            QTimer::singleShot(500, this, SLOT(changeInstensity()));
+        }
+        else {
+            ui->bottom3Graphs->setValue(2);
+            QTimer::singleShot(500, this, SLOT(changeInstensity()));
+        }
+    }
+    else {
+        lowBatteryTimer->stop();
+        changeInstensityDisplay();
+        blinkCount = 0;
+    }
+}
+
 
 void MainWindow::toggleElectrodes() {
     if (isConnected) {
@@ -116,6 +157,7 @@ void MainWindow::toggleElectrodes() {
 }
 
 void MainWindow::updateConnection(){
+    //reconnect ear clips from paused session
     if(mngr->isSessionPaused() && ui->adminConnectedComboBox->currentIndex() == 0) {
         isConnected = true;
         mngr->unpauseSession();
@@ -123,9 +165,9 @@ void MainWindow::updateConnection(){
     //session is running and user disconnects ear clips
     else if (sessionInProgress && ui->adminConnectedComboBox->currentIndex() == 1){
         isConnected = false;
+        noConnectionBlink();
         mngr->pauseSession();
     }
-    //reconnect ear clips from paused session
     else if (ui->adminConnectedComboBox->currentIndex() == 0) {
         isConnected = true;;
     }
@@ -234,15 +276,41 @@ void MainWindow::checkButtonPress(){
 
 bool MainWindow::connectionTest(){
     //need to expand on this later by displaying according to the manual
-    currIntensity = 8;
-    changeInstensityDisplay();
-    ui->connectElectrodeButton->setStyleSheet("background-color:white");
-
     //inform console of connection state
-    QString connectionResult = isConnected ? "device probes are connected" : "not connected, try again";
+    QString connectionResult;
+    if (isConnected) {
+        connectionResult = "device probes are connected";
+        QTimer::singleShot(0, this, SLOT(okayConnectionTest()));
+    }
+    else {
+        connectionResult = "not connected, try again";
+        noConnectionBlink();
+    }
     qInfo() << connectionResult;
-
     return isConnected;
+}
+
+void MainWindow::noConnectionBlink() {
+    QTimer::singleShot(0, this, SLOT(noConnectionTestBlink()));
+    QTimer::singleShot(500, this, SLOT(resetConnectionTest()));
+    QTimer::singleShot(1000, this, SLOT(noConnectionTestBlink()));
+    QTimer::singleShot(1500, this, SLOT(resetConnectionTest()));
+    QTimer::singleShot(2000, this, SLOT(noConnectionTestBlink()));
+    QTimer::singleShot(2500, this, SLOT(resetConnectionTest()));
+}
+
+void MainWindow::noConnectionTestBlink() {
+    ui->bottom3Graphs->setValue(0);
+    ui->middle3Graphs->setValue(0);
+    ui->top2Graphs->setValue(2);
+}
+
+void MainWindow::okayConnectionTest() {
+    ui->bottom3Graphs->setValue(3);
+}
+
+void MainWindow::resetConnectionTest() {
+    changeInstensityDisplay();
 }
 
 void MainWindow::changeInstensity(){
