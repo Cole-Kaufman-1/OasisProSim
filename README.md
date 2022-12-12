@@ -19,7 +19,7 @@
   - Program Design
  
 ## File Organization:
-- OasisProSim - Contains README, QtCreator files and header/source files
+- OasisProSim - Contains QtCreator files and header/source files
 - Design-Documents - Contains all required Design Documents
 
 ## Test Cases
