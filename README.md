@@ -16,7 +16,7 @@
   - UI
   - Program Logic
 - All
- - Program Design
+  - Program Design
  
 ## File Organization:
 - OasisProSim - Contains README, QtCreator files and header/source files
